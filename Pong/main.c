@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 
 #define WINDOW_W 640
@@ -18,6 +19,8 @@
 #define PADDLE1_X   PADDLE_W // paddle margin = paddle width
 #define PADDLE2_X   WINDOW_W - (PADDLE_W * 2)
 #define PADDLE_SPEED 3
+#define BALL_D      20
+#define BALL_SPEED 3
 
 typedef unsigned char byte;
 
@@ -25,6 +28,12 @@ typedef struct {
     SDL_Rect rect;
     int score;
 } paddle_t;
+
+typedef struct {
+    SDL_Rect rect;
+    int dx;
+    int dy;
+} ball_t;
 
 enum { left, right, NUMPADDLES };
 typedef enum { false, true } bool;
@@ -45,6 +54,7 @@ int main() {
     const byte* keystate;
     SDL_RendererFlags flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
     paddle_t paddles[NUMPADDLES];
+    ball_t ball;
     
     
     SDL_Init(SDL_INIT_VIDEO);
@@ -52,6 +62,8 @@ int main() {
     renderer = SDL_CreateRenderer(window, -1, flags);
     
     keystate = SDL_GetKeyboardState(NULL);
+    
+    srand((unsigned)time(NULL));
     
     for(int i = 0; i < NUMPADDLES; i++) {
         // Setting initial paddle position
@@ -61,12 +73,28 @@ int main() {
         paddles[i].rect.h = PADDLE_H;
     }
     
+    ball.rect.x = WINDOW_W / 2;
+    ball.rect.y = WINDOW_H / 2;
+    ball.rect.w = BALL_D;
+    ball.rect.h = BALL_D;
+    ball.dx = 0;
+    ball.dy = 0;
     
     while (1) {
         // Check for input
         while (SDL_PollEvent(&event)) {
             if(event.type == SDL_QUIT){
                 exit(0);
+            }
+            
+            if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_SPACE) {
+                if(rand() % 2){
+                    ball.dx = BALL_SPEED;
+                    ball.dy = -BALL_SPEED;
+                } else {
+                    ball.dx = -BALL_SPEED;
+                    ball.dy = BALL_SPEED;
+                }
             }
         }
         
@@ -85,7 +113,28 @@ int main() {
             MovePaddle(&paddles[right], PADDLE_SPEED);
         }
         
-        // Process game
+        
+        // Update game
+        
+        ball.rect.x += ball.dx;
+        ball.rect.y += ball.dy;
+        
+        if(ball.rect.x < 0){
+            ball.dx = -ball.dx;
+            ball.rect.x = 0;
+        }
+        if(ball.rect.x > WINDOW_W - ball.rect.w){
+            ball.dx = -ball.dx;
+            ball.rect.x = WINDOW_W - ball.rect.w;
+        }
+        if(ball.rect.y < 0){
+            ball.dy = -ball.dy;
+            ball.rect.y = 0;
+        }
+        if(ball.rect.y > WINDOW_H - ball.rect.h){
+            ball.dy = -ball.dy;
+            ball.rect.y = WINDOW_H - ball.rect.h;
+        }
         
         // Draw everything
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -94,8 +143,11 @@ int main() {
         SDL_SetRenderDrawColor(renderer, 3, 80, 233, 255);
         SDL_RenderFillRect(renderer, &paddles[left].rect);
         SDL_RenderFillRect(renderer, &paddles[right].rect);
-        SDL_RenderPresent(renderer);
         
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderFillRect(renderer, &ball.rect);
+        
+        SDL_RenderPresent(renderer);
         SDL_Delay(10);
     }
     return 0;
