@@ -12,18 +12,18 @@
 #include <SDL2/SDL.h>
 #include <SDL2_ttf/SDL_ttf.h>
 
-#define WINDOW_W 640
-#define WINDOW_H 480
-#define SCALE    2
+#define WINDOW_W        640
+#define WINDOW_H        480
+#define SCALE           2
 
-#define PADDLE_W    16
-#define PADDLE_H    96
-#define PADDLE1_X   PADDLE_W // paddle margin = paddle width
-#define PADDLE2_X   WINDOW_W - (PADDLE_W * 2)
-#define PADDLE_SPEED 3
-#define BALL_D      20
-#define BALL_SPEED 3
-#define MARGIN      40
+#define PADDLE_W        16
+#define PADDLE_H        96
+#define PADDLE1_X       PADDLE_W // paddle margin = paddle width
+#define PADDLE2_X       WINDOW_W - (PADDLE_W * 2)
+#define PADDLE_SPEED    3
+#define BALL_D          20
+#define BALL_SPEED      3
+#define MARGIN          40
 
 typedef unsigned char byte;
 
