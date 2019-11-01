@@ -118,7 +118,7 @@ int main() {
         exit(2);
     }
     
-    font = TTF_OpenFont("PlantagenetCherokee.ttf", 32);
+    font = TTF_OpenFont("VT323-Regular.ttf", 32);
     if (!font) {
         puts("could not load font");
         exit(1);
