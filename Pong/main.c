@@ -147,7 +147,16 @@ int main() {
         // Check for input
         while (SDL_PollEvent(&event)) {
             if(event.type == SDL_QUIT){
+                for (int i = 0; i < 2; i++) {
+                    SDL_DestroyTexture(score_textures[i]);
+                }
+                TTF_CloseFont(font);
+                TTF_Quit();
                 StopSound();
+                SDL_DestroyRenderer(renderer);
+                SDL_DestroyWindow(window);
+                SDL_Quit();
+                
                 exit(0);
             }
             
