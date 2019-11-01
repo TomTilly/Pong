@@ -11,6 +11,7 @@
 #include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2_ttf/SDL_ttf.h>
+#include "sound.h"
 
 #define WINDOW_W        640
 #define WINDOW_H        480
@@ -104,10 +105,12 @@ int main() {
     score_rects[right].y = WINDOW_H - MARGIN;
     
     
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     window = SDL_CreateWindow("Pong", 0, 0, WINDOW_W * SCALE, WINDOW_H * SCALE, 0);
     renderer = SDL_CreateRenderer(window, -1, flags);
     SDL_RenderSetScale(renderer, SCALE, SCALE);
+    
+    InitSound();
     
     // init font
     if(TTF_Init() == -1) {
@@ -144,6 +147,7 @@ int main() {
         // Check for input
         while (SDL_PollEvent(&event)) {
             if(event.type == SDL_QUIT){
+                StopSound();
                 exit(0);
             }
             
@@ -182,21 +186,26 @@ int main() {
         ball.rect.y += ball.dy;
         
         // Bounds collision detection
-        if(ball.rect.x < 0){
+        if(ball.rect.x < -BALL_D){
             ResetGame(&ball, &game_started);
+            
             UpdateScore(right, &score_textures[right], font, renderer, &paddles[right].score, paddles[right].score + 1, &score_rects[right]);
+            PlaySound(SND_GOAL);
         }
-        if(ball.rect.x > WINDOW_W - ball.rect.w){
+        if(ball.rect.x > WINDOW_W){
             ResetGame(&ball, &game_started);
             UpdateScore(left, &score_textures[left], font, renderer, &paddles[left].score, paddles[left].score + 1, &score_rects[left]);
+            PlaySound(SND_GOAL);
         }
         if(ball.rect.y < 0){
             ball.dy = -ball.dy;
             ball.rect.y = 0;
+            PlaySound(SND_TOPHIT);
         }
         if(ball.rect.y > WINDOW_H - ball.rect.h){
             ball.dy = -ball.dy;
             ball.rect.y = WINDOW_H - ball.rect.h;
+            PlaySound(SND_TOPHIT);
         }
         
         // Paddle collision detection
@@ -207,6 +216,7 @@ int main() {
             {
                 ball.dx = -ball.dx;
                 ball.rect.x = paddles[right].rect.x - BALL_D;
+                PlaySound(SND_PADHIT);
             }
         } else if(ball.dx < 0) { // moving to the left
             if(ball.rect.y < paddles[left].rect.y + PADDLE_H &&
@@ -215,6 +225,7 @@ int main() {
             {
                 ball.dx = -ball.dx;
                 ball.rect.x = paddles[left].rect.x + PADDLE_W;
+                PlaySound(SND_PADHIT);
             }
         }
         
