@@ -116,9 +116,11 @@ int main() {
         
         // Update game
         
+        // Update ball position
         ball.rect.x += ball.dx;
         ball.rect.y += ball.dy;
         
+        // Bounds collision detection
         if(ball.rect.x < 0){
             ball.dx = -ball.dx;
             ball.rect.x = 0;
@@ -134,6 +136,25 @@ int main() {
         if(ball.rect.y > WINDOW_H - ball.rect.h){
             ball.dy = -ball.dy;
             ball.rect.y = WINDOW_H - ball.rect.h;
+        }
+        
+        // Paddle collision detection
+        if(ball.dx > 0){ // moving to the right
+            if(ball.rect.y < paddles[right].rect.y + PADDLE_H &&
+               ball.rect.y + BALL_D > paddles[right].rect.y &&
+               ball.rect.x + BALL_D > paddles[right].rect.x)
+            {
+                ball.dx = -ball.dx;
+                ball.rect.x = paddles[right].rect.x - BALL_D;
+            }
+        } else if(ball.dx < 0) { // moving to the left
+            if(ball.rect.y < paddles[left].rect.y + PADDLE_H &&
+               ball.rect.y + BALL_D > paddles[left].rect.y &&
+               ball.rect.x < paddles[left].rect.x + PADDLE_W)
+            {
+                ball.dx = -ball.dx;
+                ball.rect.x = paddles[left].rect.x + PADDLE_W;
+            }
         }
         
         // Draw everything
